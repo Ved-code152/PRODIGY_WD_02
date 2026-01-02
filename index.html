@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stopwatch Web Application</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1d2671, #c33764);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .stopwatch-container {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .time-display {
+            font-size: 40px;
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+
+        .buttons button {
+            padding: 10px 15px;
+            margin: 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .start {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .pause {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .reset {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .lap {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .buttons button:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .laps {
+            margin-top: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .laps h3 {
+            text-align: center;
+        }
+
+        .laps ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .laps li {
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="stopwatch-container">
+    <h1>⏱ Stopwatch</h1>
+
+    <div class="time-display" id="display">
+        00:00:00.000
+    </div>
+
+    <div class="buttons">
+        <button class="start" onclick="startStopwatch()">Start</button>
+        <button class="pause" onclick="pauseStopwatch()">Pause</button>
+        <button class="reset" onclick="resetStopwatch()">Reset</button>
+        <button class="lap" onclick="recordLap()">Lap</button>
+    </div>
+
+    <div class="laps">
+        <h3>Lap Times</h3>
+        <ul id="lapList"></ul>
+    </div>
+</div>
+
+<script>
+    let startTime = 0;
+    let elapsedTime = 0;
+    let timerInterval;
+    let running = false;
+    let lapCount = 0;
+
+    function startStopwatch() {
+        if (!running) {
+            running = true;
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(updateTime, 10);
+        }
+    }
+
+    function pauseStopwatch() {
+        if (running) {
+            running = false;
+            clearInterval(timerInterval);
+        }
+    }
+
+    function resetStopwatch() {
+        running = false;
+        clearInterval(timerInterval);
+        elapsedTime = 0;
+        lapCount = 0;
+        document.getElementById("display").textContent = "00:00:00.000";
+        document.getElementById("lapList").innerHTML = "";
+    }
+
+    function updateTime() {
+        elapsedTime = Date.now() - startTime;
+
+        let milliseconds = Math.floor((elapsedTime % 1000));
+        let seconds = Math.floor((elapsedTime / 1000) % 60);
+        let minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
+        let hours = Math.floor(elapsedTime / (1000 * 60 * 60));
+
+        document.getElementById("display").textContent =
+            formatTime(hours) + ":" +
+            formatTime(minutes) + ":" +
+            formatTime(seconds) + "." +
+            formatMilliseconds(milliseconds);
+    }
+
+    function recordLap() {
+        if (running) {
+            lapCount++;
+            const lapTime = document.getElementById("display").textContent;
+            const lapItem = document.createElement("li");
+            lapItem.textContent = `Lap ${lapCount}: ${lapTime}`;
+            document.getElementById("lapList").appendChild(lapItem);
+        }
+    }
+
+    function formatTime(time) {
+        return time < 10 ? "0" + time : time;
+    }
+
+    function formatMilliseconds(ms) {
+        if (ms < 10) return "00" + ms;
+        if (ms < 100) return "0" + ms;
+        return ms;
+    }
+</script>
+
+</body>
+</html>
